@@ -1,8 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en-us">
     <head>
         <meta charset="UTF-8">
         <title>Clash Reservations</title>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
 
         <!-- Angular -->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
@@ -150,17 +154,29 @@
                         { name: "p2", resvs: [{ state: "*" }] },
                         { name: "p3", resvs: [{ state: "**" }, { state: "**" }, { state: "***" }] },
                     ];
+                                               
 
-
-                    $scope.onOpponentSelected = function () {
-
+                    $scope.onOpponentSelected = function (opponent) {
+                        $scope.oSelectedOpponent = ($scope.oSelectedOpponent == opponent ? null : opponent);
+                    }
+                    $scope.onDeSelectOpponent = function () {
+                        $scope.oSelectedOpponent = null;
                     }
                 }]);
 
 
             app.controller("reserveItemCtrl", ["$scope", "$firebaseArray",
                 function ($scope, $firebaseArray) {
-
+                                               
+                    $scope.onUpdate = function (resv) {
+                        $scope.oUpdateResv = (resv == $scope.oUpdateResv ? null : resv);
+                    };
+                    $scope.onRemove = function (resv) {
+                        $scope.oRemoveResv = resv;
+                    };
+                    $scope.onAdd = function () {
+                        $scope.oSelectedOpponent.resvs.push({state: $scope.sName });
+                    };
 
                 }]);
 
@@ -176,12 +192,15 @@
 
                 <div ng-controller="reserveCreateCtrl" ng-show="iPageMode == 1">
                     Create stuff
+                    <input placeholder="Clan Name" ng-model="sClanName"/>
+                    <input placeholder="War Size" ng-model="iWarSize"/>
+                    <input placeholder="Timer Type" ng-model="iTimerType"/>
                     <button ng-click="onSubmit()">Submit</button>
                 </div>
 
                 <div ng-controller="reserveJoinCtrl" ng-show="iPageMode == 2">
                     Join stuff
-                    <input ng-model="sInputResvCode"/>
+                    <input placeholder="Reserve Code" ng-model="sInputResvCode"/>
                     <button ng-click="onSubmit()">Submit</button>
                 </div>
 
@@ -193,19 +212,41 @@
             <div ng-controller="reserveListCtrl" ng-show="oCommonData.sResvCode">
                 Hello! {{ oCommonData.sResvCode }}
 
-                <ul>
+                <ul class="w3-ul">
                     <li ng-repeat="opponent in opponents">
+                        <a class="w3-btn-floating" ng-click="onOpponentSelected(opponent)">o</a>
                         <span>{{ opponent.name }}</span>
                         <ul>
                             <li ng-repeat="resv in opponent.resvs">
                                 <span>{{resv.state}}</span>
                             </li>
                         </ul>
-                        <button ng-click="onOpponentSelected()">Select</button>
                     </li>
                 </ul>
 
-                <div ng-controller="reserveItemCtrl">
+                <div class="w3-bottom w3-container w3-border" ng-controller="reserveItemCtrl" ng-show="oSelectedOpponent">
+                    <span>You selected {{ oSelectedOpponent.name }}</span>
+                    
+                    <input placeholder="name" ng-model="sName" />
+                    <button ng-click="onAdd()">Add</button>
+                    <button ng-click="onDeSelectOpponent()">DeSelect</button>
+                    <ul class="w3-ul">
+                        <li ng-repeat="resv in oSelectedOpponent.resvs">
+                            <div class="w3-row">
+                                <div class="w3-col s3">{{resv.state}}</div>
+                                <div class="w3-col s6">
+                                    <button ng-click="onUpdate(resv)">Update</button>
+                                    <button ng-click="onRemove(resv)">Remove</button>
+                                </div>
+                                <div class="w3-col s6" ng-show="oUpdateResv == resv">
+                                    <input placeholder="stars" ng-model="stars" />
+                                    <button>Finish Update</button>
+                                    <button>Renew</button>
+                                    <button>Cancel</button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
 
                 </div>
             </div>
