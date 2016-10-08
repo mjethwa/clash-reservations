@@ -5,7 +5,7 @@
         <title>Clash Reservations</title>
         
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css" />
+        <link rel="stylesheet" href="css/w3.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
 
         <!-- Angular -->
@@ -15,69 +15,7 @@
         <!-- AngularFire -->
         <script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"></script>
 
-        <script type="text/javascript">
-
-            function generateCode() {
-                var vowels = "aeiou";
-                var consonents = "bcdfghjklmnpqrstvwxyz";
-                var digits = "0123456789";
-
-                var result = "";
-
-                result = result.concat(
-                    randomChar(consonents), randomChar(vowels),
-                    randomChar(consonents), randomChar(vowels),
-                    randomChar(consonents), randomChar(vowels),
-                    randomChar(digits), randomChar(digits)
-                    );
-
-                return result;
-
-            }
-
-            function randomChar(fromString) {
-                if (!fromString) return null;
-                return fromString.charAt(Math.floor(Math.random() * fromString.length));
-            }
-
-
-            function getCookies() {
-                var result = {};
-
-                var c = document.cookie.split('; ');
-                for (i = c.length - 1; i >= 0; i--) {
-                    var C = c[i].split('=');
-                    result[C[0]] = C[1];
-                }
-
-                return result;
-            }
-
-            function setCookie(cKey, cVal) {
-                if (typeof (cKey) != "string" || typeof (cVal) != "string") {
-                    console.log("Attempted to set cookie with non string values");
-                    return;
-                }
-
-                document.cookie = cKey + "=" + cVal + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
-            }
-
-            function getArguments() {
-
-                var result = {};
-                var sStr = window.location.search;
-
-                if (sStr.startsWith("?")) sStr = sStr.substring(1);
-                var c = sStr.split('&');
-                for (i = c.length - 1; i >= 0; i--) {
-                    var C = c[i].split('=');
-                    result[C[0]] = C[1];
-                }
-
-                return result;
-            }
-
-        </script>
+        <script src="javascript/lib.js"></script>
 
         <script type="text/javascript">
 
@@ -188,7 +126,7 @@
                         { $id: 1, sOpponentName: "p2", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 0, iResvTime: 20000 }, { $id: 1, sPlayerName: "James", iResult: null, iResvTime: 20000 }] },
                         { $id: 2, sOpponentName: "p3", loResvs: [] },
                         { $id: 3, sOpponentName: "p4", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 1, iResvTime: 20000 }] },
-                        { $id: 4, sOpponentName: "p5", loResvs: [] },
+                        { $id: 4, sOpponentName: "p5" },
                         { $id: 5, sOpponentName: "p6", loResvs: [{ $id: 0, sPlayerName: "Jim", iResult: 1, iResvTime: 20000 }, { $id: 1, sPlayerName: "John", iResult: null, iResvTime: 20000 }] },
                     ];
                                                
@@ -205,26 +143,28 @@
                 function ($scope, $firebaseArray) {
                                                
                     $scope.onUpdateOption = function (resv) {
-                        $scope.oUpdateResv = (resv == $scope.oUpdateResv ? null : resv);
+                        $scope.oSelectedResv = (resv == $scope.oUpdateResv ? null : resv);
+                        $scope.iStars = resv.iResult;
                     };
                     $scope.onRemoveOption = function (resv) {
-                        $scope.oRemoveResv = resv;
+                        
                     };
                     $scope.onAdd = function () {
+                        if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
                         $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: $scope.sName, iResvTime: (new Date()).getTime()});
                     };
                     $scope.onSave = function (resv) {
                         //$scope.$apply();
-                        $scope.oUpdateResv.iResult = $scope.iStars;
-                        $scope.oUpdateResv = null;
+                        $scope.oSelectedResv.iResult = $scope.iStars;
+                        $scope.oSelectedResv = null;
                     };
                     $scope.onRenew = function (resv) {
-                        $scope.oUpdateResv.iResvTime = (new Date()).getTime();
-                        $scope.oUpdateResv = null;
+                        $scope.oSelectedResv.iResvTime = (new Date()).getTime();
+                        $scope.oSelectedResv = null;
                     };
                     $scope.onUpdateCancel = function (resv) {
-                        $scope.oUpdateResv = null;
+                        $scope.oSelectedResv = null;
                     };
 
 
@@ -293,9 +233,11 @@
                             </div>  
                             <div class="w3-col s2">
                                 <span class="w3-tag">{{ $index + '. ' + opponent.sOpponentName }}</span>
-                            </div> 
-                            <div class="w3-col s2" ng-repeat="resv in opponent.loResvs">
-                                <span class="w3-grey">{{resv.sPlayerName}} : {{resv.iResult}}</span>
+                            </div>
+                            <div class="w3-col s9 w3-row-padding">
+                                <div class="w3-col s2" ng-repeat="resv in opponent.loResvs">
+                                    <span class="w3-grey">{{resv.sPlayerName}} : {{resv.iResult}}</span>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -303,32 +245,35 @@
 
                 <div class="w3-bottom w3-container w3-border w3-padding-16 w3-white" ng-controller="reserveItemCtrl" ng-show="oSelectedOpponent">
                     <button class="w3-btn" ng-click="onDeSelectOpponent()"><i class="fa fa-times"></i></button>
-                    <div class="w3-panel">
-                        <span class="w3-tag">You selected {{ oSelectedOpponent.sName }}</span>
-                    </div>
+                    <span class="w3-tag">Opponent: {{ oSelectedOpponent.sOpponentName }}</span>
+
                     
-                    <div class="w3-panel">
+                    <div class="w3-panel" ng-show="!oSelectedResv">
                         <input placeholder="name" ng-model="sName" />
                         <button class="w3-btn" ng-click="onAdd()">Add</button>
                     </div>
 
-                    <ul class="w3-ul">
+                    <ul class="w3-ul" ng-show="!oSelectedResv">
                         <li ng-repeat="resv in oSelectedOpponent.loResvs | orderBy:'$id':true">
                             <div class="w3-row-padding">
+                                <div class="w3-col s1">
+                                    <button class="w3-btn" ng-click="onUpdateOption(resv)"><i class="fa fa-pencil"></i></button>
+                                </div>
                                 <div class="w3-col s3">{{resv.sPlayerName}} : {{resv.iResult}}</div>
-                                <div class="w3-col s6">
-                                    <button class="w3-btn" ng-click="onUpdateOption(resv)">Update</button>
-                                    <button class="w3-btn" ng-click="onRemoveOption(resv)">Remove</button>
-                                </div>
-                                <div class="w3-panel w3-col s6" ng-show="oUpdateResv == resv">
-                                    <input placeholder="stars" ng-model="iStars" />
-                                    <button class="w3-btn" ng-click="onSave(resv)">Save</button>
-                                    <button class="w3-btn" ng-click="onRenew(resv)">Renew</button>
-                                    <button class="w3-btn" ng-click="onUpdateCancel(resv)"><i class="fa fa-undo"></i></button>
-                                </div>
                             </div>
                         </li>
                     </ul>
+                    
+                    <div class="w3-panel w3-border" ng-show="oSelectedResv">
+                        <button class="w3-btn" ng-click="onUpdateCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
+                        <span class="w3-tag">Player: {{ oSelectedResv.sPlayerName }}</span>
+                        <br/>
+                        <input placeholder="stars" ng-model="iStars"></input>
+                        <button class="w3-btn" ng-click="onSave(oSelectedResv)">Save</button>
+                        <br/>
+                        <button class="w3-btn" ng-click="onRenew(oSelectedResv)">Renew</button>
+                        <button class="w3-btn" ng-click="onRemoveOption(oSelectedResv)">Remove</button>
+                    </div>
 
                 </div>
             </div>
