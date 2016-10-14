@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-us">
     <head>
         <meta charset="UTF-8">
@@ -63,8 +63,8 @@
 
             var app = angular.module("reserveApp", ["firebase"]);
 
-            app.controller("reserveCtrl", ["$scope", "$firebaseArray",
-                function ($scope, $firebaseArray) {
+            app.controller("reserveCtrl", ["$scope", "$timeout", "$firebaseArray",
+                function ($scope, $timeout, $firebaseArray) {
                     $scope.setResvCode = function (resvCode, mustExist) {
                         if (!resvCode) return false;
 
@@ -82,7 +82,17 @@
                     $scope.oCommonData = { sResvCode: null };
 
                     $scope.setResvCode(oArguments["resvCode"], true);
-                                           
+                    
+                    $scope.updateServerTime = function () {
+                        $scope.serverTime = (new Date()).getTime();
+                        $timeout($scope.updateServerTime, 60000);
+                    };
+                    $scope.updateServerTime(); //trigger the polling
+                    $scope.getServerTime = function () {
+                        //return (new Date()).getTime();
+                        return $scope.serverTime;
+                    };
+
                                            
                     /*
                     data_paths:
@@ -108,12 +118,12 @@
                     };
                                            
                     $scope.loOpponents = [
-                        { $id: 0, sOpponentName: "p1", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 2, iResvTime: 20000 }, { $id: 1, sPlayerName: "James", iResult: null, iResvTime: 20000 }] },
-                        { $id: 1, sOpponentName: "p2", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 0, iResvTime: 20000 }, { $id: 1, sPlayerName: "James", iResult: null, iResvTime: 20000 }] },
+                        { $id: 0, sOpponentName: "p1", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 2, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "James", iResult: null, iResvTime: $scope.getServerTime() }] },
+                        { $id: 1, sOpponentName: "p2", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 0, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "James", iResult: null, iResvTime: $scope.getServerTime() }] },
                         { $id: 2, sOpponentName: "p3", loResvs: [] },
-                        { $id: 3, sOpponentName: "p4", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 1, iResvTime: 20000 }] },
+                        { $id: 3, sOpponentName: "p4", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 1, iResvTime: $scope.getServerTime() }] },
                         { $id: 4, sOpponentName: "p5" },
-                        { $id: 5, sOpponentName: "p6", loResvs: [{ $id: 0, sPlayerName: "Jim", iResult: 1, iResvTime: 20000 }, { $id: 1, sPlayerName: "John", iResult: null, iResvTime: 20000 }] },
+                        { $id: 5, sOpponentName: "p6", loResvs: [{ $id: 0, sPlayerName: "Jim", iResult: 1, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "John", iResult: null, iResvTime: $scope.getServerTime() }] },
                         ];
                        
                     //configs
@@ -169,32 +179,24 @@
                         return ($scope.iPageMode == 2);
                     };
 
-                }]);
-
-            app.controller("reserveCreateCtrl", ["$scope", "$firebaseArray",
-                function ($scope, $firebaseArray) {
-
-                    $scope.onSubmit = function () {
+                    $scope.onCreateRequested = function () {
                         //$scope.oCommonData.sResvCode = generateCode();
                         $scope.setResvCode(generateCode(), false);
                     }
 
-                }]);
-
-            app.controller("reserveJoinCtrl", ["$scope", "$firebaseArray",
-                function ($scope, $firebaseArray) {
-
-                    $scope.onSubmit = function () {
+                    $scope.onJoinRequested = function () {
                         //$scope.oCommonData.sResvCode = $scope.sInputResvCode;
                         $scope.setResvCode($scope.sInputResvCode, true);
                     }
 
                 }]);
 
+
             app.controller("reserveListCtrl", ["$scope", "$firebaseArray",
                 function ($scope, $firebaseArray) {
 
-                    $scope.onCancelOption = function () {
+                    $scope.onLeaveOption = function () {                     
+                        $scope.onDeSelectOpponent();
                         $scope.unsetResvCode();
                     };
 
@@ -202,36 +204,37 @@
                         $scope.oSelectedOpponent = ($scope.oSelectedOpponent == opponent ? null : opponent);
                     }
                     $scope.onDeSelectOpponent = function () {
+                        $scope.onUpdateResvCancel();
                         $scope.oSelectedOpponent = null;
                     }
-                }]);
 
-            app.controller("reserveItemCtrl", ["$scope", "$firebaseArray",
-                function ($scope, $firebaseArray) {
-                                               
-                    $scope.onUpdateOption = function (resv) {
+                    $scope.onUpdateResvOption = function (resv) {
                         $scope.oSelectedResv = (resv == $scope.oUpdateResv ? null : resv);
                         $scope.iStars = resv.iResult;
                     };
-                    $scope.onRemoveOption = function (resv) {
-                        
+                    $scope.onRemoveResvOption = function (resv) {
+
                     };
-                    $scope.onAdd = function () {
+                    $scope.onAddResv = function () {
                         if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
-                        $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: $scope.sName, iResvTime: (new Date()).getTime()});
+                        $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: $scope.sName, iResvTime: $scope.getServerTime() });
                     };
-                    $scope.onSave = function (resv) {
+                    $scope.onSaveResv = function (resv) {
                         //$scope.$apply();
                         $scope.oSelectedResv.iResult = $scope.iStars;
                         $scope.oSelectedResv = null;
                     };
-                    $scope.onRenew = function (resv) {
-                        $scope.oSelectedResv.iResvTime = (new Date()).getTime();
+                    $scope.onRenewResv = function (resv) {
+                        $scope.oSelectedResv.iResvTime = $scope.getServerTime();
                         $scope.oSelectedResv = null;
                     };
-                    $scope.onUpdateCancel = function (resv) {
+                    $scope.onUpdateResvCancel = function (resv) {
                         $scope.oSelectedResv = null;
+                    };
+
+                    $scope.getElapsedMinutes = function (resv) {
+                        return Math.floor(($scope.getServerTime() - resv.iResvTime) / 60000);
                     };
 
 
@@ -251,7 +254,7 @@
                     <button class="w3-btn" ng-click="onCancelOption()"><i class="fa fa-undo"></i></button>
                 </div>
 
-                <div class="w3-panel" ng-controller="reserveCreateCtrl" ng-show="isOptionCreate()">
+                <div class="w3-panel" ng-show="isOptionCreate()">
                     <input class="w3-input" placeholder="Clan Name" ng-model="sClanName"/>
                     <input class="w3-input" placeholder="Enemy Clan Name" ng-model="sOppositionClanName" />
                     <select class="w3-select" ng-model="iWarSize">
@@ -262,18 +265,18 @@
                         <option value="" disabled selected>Choose timer type ...</option>
                         <option ng-repeat="opt in loTimerTypes" value="{{opt.val}}">{{opt.txt}}</option>
                     </select>
-                    <button class="w3-btn" ng-click="onSubmit()">Submit</button>
+                    <button class="w3-btn" ng-click="onCreateRequested()">Submit</button>
                 </div>
 
-                <div class="w3-panel" ng-controller="reserveJoinCtrl" ng-show="isOptionJoin()">
+                <div class="w3-panel" ng-show="isOptionJoin()">
                     <input class="w3-input" placeholder="Reserve Code" ng-model="sInputResvCode"/>
-                    <button class="w3-btn" ng-click="onSubmit()">Submit</button>
+                    <button class="w3-btn" ng-click="onJoinRequested()">Submit</button>
                 </div>
 
             </div>
             <div class="w3-container" ng-controller="reserveListCtrl" ng-show="oCommonData.sResvCode">
                 <div class="w3-panel">
-                    <button class="w3-btn" ng-click="onCancelOption()"><i class="fa fa-undo"></i></button>
+                    <button class="w3-btn" ng-click="onLeaveOption()"><i class="fa fa-undo"></i></button>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">Code {{ oCommonData.sResvCode }}</span>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">{{ (oWarInfo.sClanName ? oWarInfo.sClanName : "Your Clan" ) }} v {{ (oWarInfo.sOppositionClanName ? oWarInfo.sOppositionClanName : "Opposition") }}</span>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">Timer {{ oWarInfo.sTimerType }}</span>
@@ -291,21 +294,25 @@
                             </div>
                             <div class="w3-rest w3-row-padding">
                                 <div class="w3-col mj-col-tag" ng-repeat="resv in opponent.loResvs">
-                                    <span class="w3-grey">{{resv.sPlayerName}} : {{resv.iResult}}</span>
+                                    <div class="w3-tag w3-grey">
+                                        <span>{{resv.sPlayerName}}:</span>
+                                        <span ng-if="resv.iResult || resv.iResult == 0">{{resv.iResult}}</span>
+                                        <span ng-if="!(resv.iResult || resv.iResult == 0) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </li>
                 </ul>
 
-                <div class="w3-bottom w3-container w3-border w3-padding-16 w3-white" ng-controller="reserveItemCtrl" ng-show="oSelectedOpponent">
+                <div class="w3-bottom w3-container w3-border w3-padding-16 w3-white" ng-show="oSelectedOpponent">
                     <button class="w3-btn" ng-click="onDeSelectOpponent()"><i class="fa fa-times"></i></button>
                     <span class="w3-tag w3-padding w3-round-large">Opponent: {{ oSelectedOpponent.sOpponentName }}</span>
 
                     
                     <div class="w3-panel" ng-show="!oSelectedResv">
                         <input placeholder="name" ng-model="sName" />
-                        <button class="w3-btn" ng-click="onAdd()">Add</button>
+                        <button class="w3-btn" ng-click="onAddResv()">Add</button>
                     </div>
 
                     <div class="mj-half-scroll">
@@ -313,9 +320,16 @@
                             <li ng-repeat="resv in oSelectedOpponent.loResvs | orderBy:'$id':true">
                                 <div class="w3-row-padding">
                                     <div class="w3-col mj-col-button">
-                                        <button class="w3-btn" ng-click="onUpdateOption(resv)"><i class="fa fa-pencil"></i></button>
+                                        <button class="w3-btn" ng-click="onUpdateResvOption(resv)"><i class="fa fa-pencil"></i></button>
                                     </div>
-                                    <div class="w3-rest">{{resv.sPlayerName}} : {{resv.iResult}}</div>
+
+                                    <!--<div class="w3-rest">{{resv.sPlayerName}} : {{resv.iResult}}</div>-->
+
+                                    <div class="w3-rest w3-tag w3-grey">
+                                        <span>{{resv.sPlayerName}}:</span>
+                                        <span ng-if="resv.iResult || resv.iResult == 0">{{resv.iResult}}</span>
+                                        <span ng-if="!(resv.iResult || resv.iResult == 0) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -324,16 +338,16 @@
                     
                     <div class="w3-panel w3-border" ng-show="oSelectedResv">
                         <div class="w3-panel">
-                            <button class="w3-btn" ng-click="onUpdateCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
+                            <button class="w3-btn" ng-click="onUpdateResvCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
                             <span class="w3-tag w3-padding w3-round-large">Player: {{ oSelectedResv.sPlayerName }}</span>
                         </div>
                         <div class="w3-panel">
                             <input placeholder="stars" ng-model="iStars"></input>
-                            <button class="w3-btn" ng-click="onSave(oSelectedResv)">Save</button>
+                            <button class="w3-btn" ng-click="onSaveResv(oSelectedResv)">Save</button>
                         </div>
                         <div class="w3-panel">
-                            <button class="w3-btn" ng-click="onRenew(oSelectedResv)">Renew</button>
-                            <button class="w3-btn" ng-click="onRemoveOption(oSelectedResv)">Remove</button>
+                            <button class="w3-btn" ng-click="onRenewResv(oSelectedResv)">Renew</button>
+                            <button class="w3-btn" ng-click="onRemoveResvOption(oSelectedResv)">Remove</button>
                         </div>
                     </div>
 
