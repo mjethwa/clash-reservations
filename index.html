@@ -19,7 +19,7 @@
             }
             .mj-half-scroll{
                 max-height:50vh;
-                overflow:scroll;
+                overflow-y:scroll;
             }
         
             /*medium*/
@@ -212,6 +212,27 @@
                         $scope.oSelectedResv = (resv == $scope.oUpdateResv ? null : resv);
                         $scope.iStars = resv.iResult;
                     };
+
+                    $scope.onIncrementStars = function () {
+                        if ($scope.iStars || $scope.iStars == 0) {
+                            if ($scope.iStars < 3) {
+                                $scope.iStars = $scope.iStars + 1;
+                            }
+                        }
+                        else {
+                            $scope.iStars = 0;
+                        }
+                    };
+
+                    $scope.onDecrementStars = function () {
+                        if ($scope.iStars) {
+                            $scope.iStars = $scope.iStars - 1;
+                        }
+                        else {
+                            $scope.iStars = null;
+                        }
+                    };
+
                     $scope.onRemoveResvOption = function (resv) {
 
                     };
@@ -296,7 +317,11 @@
                                 <div class="w3-col mj-col-tag" ng-repeat="resv in opponent.loResvs">
                                     <div class="w3-tag w3-grey">
                                         <span>{{resv.sPlayerName}}:</span>
-                                        <span ng-if="resv.iResult || resv.iResult == 0">{{resv.iResult}}</span>
+                                        <span ng-if="resv.iResult || resv.iResult == 0">
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 1, 'fa-star' : resv.iResult > 0}"></i>
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 2, 'fa-star' : resv.iResult > 1}"></i>
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 3, 'fa-star' : resv.iResult > 2}"></i>
+                                        </span>
                                         <span ng-if="!(resv.iResult || resv.iResult == 0) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
                                     </div>
                                 </div>
@@ -327,7 +352,11 @@
 
                                     <div class="w3-rest w3-tag w3-grey">
                                         <span>{{resv.sPlayerName}}:</span>
-                                        <span ng-if="resv.iResult || resv.iResult == 0">{{resv.iResult}}</span>
+                                        <span ng-if="resv.iResult || resv.iResult == 0">
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 1, 'fa-star' : resv.iResult > 0}"></i>
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 2, 'fa-star' : resv.iResult > 1}"></i>
+                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 3, 'fa-star' : resv.iResult > 2}"></i>
+                                        </span>
                                         <span ng-if="!(resv.iResult || resv.iResult == 0) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
                                     </div>
                                 </div>
@@ -342,7 +371,14 @@
                             <span class="w3-tag w3-padding w3-round-large">Player: {{ oSelectedResv.sPlayerName }}</span>
                         </div>
                         <div class="w3-panel">
-                            <input placeholder="stars" ng-model="iStars"></input>
+                            <button class="w3-btn" ng-click="onDecrementStars()" ng-class="{'w3-grey' : (!iStars && iStars != 0 )}">-</button>
+                            <!--<input placeholder="stars" ng-model="iStars" readonly></input>-->
+                            <span>
+                                <i class="fa" ng-class="{'fa-clock-o' : (!iStars && iStars != 0 ), 'fa-star-o' : iStars < 1, 'fa-star' : iStars > 0}"></i>
+                                <i class="fa" ng-class="{'fa-clock-o' : (!iStars && iStars != 0 ), 'fa-star-o' : iStars < 2, 'fa-star' : iStars > 1}"></i>
+                                <i class="fa" ng-class="{'fa-clock-o' : (!iStars && iStars != 0 ), 'fa-star-o' : iStars < 3, 'fa-star' : iStars > 2}"></i>
+                            </span>
+                            <button class="w3-btn" ng-click="onIncrementStars()" ng-class="{'w3-grey' : (iStars > 2)}">+</button>
                             <button class="w3-btn" ng-click="onSaveResv(oSelectedResv)">Save</button>
                         </div>
                         <div class="w3-panel">
