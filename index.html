@@ -55,6 +55,15 @@
 
         <script src="javascript/lib.js"></script>
 
+
+        <script type="text/ng-template" id="rating-stars">
+            <span>
+                <i class="fa" ng-class="{'fa-star-o' : iStars < 1, 'fa-star' : iStars > 0}"></i>
+                <i class="fa" ng-class="{'fa-star-o' : iStars < 2, 'fa-star' : iStars > 1}"></i>
+                <i class="fa" ng-class="{'fa-star-o' : iStars < 3, 'fa-star' : iStars > 2}"></i>
+            </span>
+        </script>  
+
         <script type="text/javascript">
 
             var oCookies = getCookies();
@@ -62,6 +71,15 @@
             console.log(oArguments["resvCode"]);
 
             var app = angular.module("reserveApp", ["firebase"]);
+
+            app.directive('ratingStars', function() {
+                return {
+                    scope: {
+                        iStars: '=stars'
+                    },
+                    templateUrl: 'templates/rating-stars'
+                };
+            });
 
             app.controller("reserveCtrl", ["$scope", "$timeout", "$firebaseArray",
                 function ($scope, $timeout, $firebaseArray) {
@@ -268,6 +286,7 @@
         </script>
     </head>
     <body>
+
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
             <div class="w3-container" ng-controller="reserveInitCtrl" ng-show="!oCommonData.sResvCode">
                 <div class="w3-panel" ng-show="isOptionPending()">
@@ -318,11 +337,7 @@
                                 <div class="w3-tag w3-padding w3-round-large">
                                     <span>{{ $index }}. {{ opponent.sOpponentName }} - </span>
                                     <span ng-repeat="resv in opponent.loResvs | orderBy:'iResult':true | limitTo:1">
-                                        <span ng-if="isStarSet(resv.iResult)">
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 1, 'fa-star' : resv.iResult > 0}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 2, 'fa-star' : resv.iResult > 1}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 3, 'fa-star' : resv.iResult > 2}"></i>
-                                        </span>                                        
+                                        <span ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></span>                                        
                                     </span>
                                 </div>
                             </div>
@@ -330,11 +345,7 @@
                                 <div class="w3-col mj-col-tag" ng-repeat="resv in opponent.loResvs">
                                     <div class="w3-tag w3-round-medium" ng-class="{'w3-dark-grey': isStarSet(resv.iResult), 'w3-deep-orange': !isStarSet(resv.iResult)}">
                                         <span>{{resv.sPlayerName}}:</span>
-                                        <span ng-if="isStarSet(resv.iResult)">
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 1, 'fa-star' : resv.iResult > 0}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 2, 'fa-star' : resv.iResult > 1}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 3, 'fa-star' : resv.iResult > 2}"></i>
-                                        </span>
+                                        <span ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></span>
                                         <span ng-if="!isStarSet(resv.iResult) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
                                     </div>
                                 </div>
@@ -365,11 +376,7 @@
 
                                     <div class="w3-rest w3-tag w3-round-medium" ng-class="{'w3-dark-grey': isStarSet(resv.iResult), 'w3-deep-orange': !isStarSet(resv.iResult)}">
                                         <span>{{resv.sPlayerName}}:</span>
-                                        <span ng-if="isStarSet(resv.iResult)">
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 1, 'fa-star' : resv.iResult > 0}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 2, 'fa-star' : resv.iResult > 1}"></i>
-                                            <i class="fa" ng-class="{'fa-star-o' : resv.iResult < 3, 'fa-star' : resv.iResult > 2}"></i>
-                                        </span>
+                                        <span ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></span> 
                                         <span ng-if="!isStarSet(resv.iResult) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
                                     </div>
                                 </div>
