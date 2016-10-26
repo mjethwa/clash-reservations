@@ -55,15 +55,6 @@
 
         <script src="javascript/lib.js"></script>
 
-
-        <script type="text/ng-template" id="rating-stars">
-            <span>
-                <i class="fa" ng-class="{'fa-star-o' : iStars < 1, 'fa-star' : iStars > 0}"></i>
-                <i class="fa" ng-class="{'fa-star-o' : iStars < 2, 'fa-star' : iStars > 1}"></i>
-                <i class="fa" ng-class="{'fa-star-o' : iStars < 3, 'fa-star' : iStars > 2}"></i>
-            </span>
-        </script>  
-
         <script type="text/javascript">
 
             var oCookies = getCookies();
@@ -77,7 +68,17 @@
                     scope: {
                         iStars: '=stars'
                     },
-                    templateUrl: 'templates/rating-stars'
+                    templateUrl: 'templates/rating-stars.html'
+                };
+            });
+
+            app.directive('timerProgress', function() {
+                return {
+                    scope: {
+                        iElapsedMin: '=elapsedMin',
+                        iElapsedPerc: '=elapsedPerc'
+                    },
+                    templateUrl: 'templates/timer-progress.html'
                 };
             });
 
@@ -276,6 +277,13 @@
                         return Math.floor(($scope.getServerTime() - resv.iResvTime) / 60000);
                     };
 
+                    $scope.getElapsedPercentage = function (resv) {
+                        var mins = $scope.getElapsedMinutes(resv);
+                        if (mins > 120) mins = 120;
+
+                        return Math.round(((mins * 1.0) / 120) * 100);
+                    }
+
                     $scope.isStarSet = function (starVal) {
                         return (starVal >= 0);
                     }
@@ -343,10 +351,10 @@
                             </div>
                             <div class="w3-rest w3-row-padding">
                                 <div class="w3-col mj-col-tag" ng-repeat="resv in opponent.loResvs">
-                                    <div class="w3-tag w3-round-medium" ng-class="{'w3-dark-grey': isStarSet(resv.iResult), 'w3-deep-orange': !isStarSet(resv.iResult)}">
+                                    <div class="w3-tag w3-round-medium w3-dark-grey">
                                         <span>{{resv.sPlayerName}}:</span>
-                                        <span ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></span>
-                                        <span ng-if="!isStarSet(resv.iResult) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
+                                        <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div>
+                                        <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" elapsed-min="getElapsedMinutes(resv)" elapsed-perc="getElapsedPercentage(resv)" timer-progress ></div>
                                     </div>
                                 </div>
                             </div>
@@ -374,10 +382,10 @@
 
                                     <!--<div class="w3-rest">{{resv.sPlayerName}} : {{resv.iResult}}</div>-->
 
-                                    <div class="w3-rest w3-tag w3-round-medium" ng-class="{'w3-dark-grey': isStarSet(resv.iResult), 'w3-deep-orange': !isStarSet(resv.iResult)}">
+                                    <div class="w3-rest w3-tag w3-round-medium w3-dark-grey">
                                         <span>{{resv.sPlayerName}}:</span>
                                         <span ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></span> 
-                                        <span ng-if="!isStarSet(resv.iResult) && resv.iResvTime">{{getElapsedMinutes(resv)}}min ago</span>
+                                        <span ng-if="!isStarSet(resv.iResult) && resv.iResvTime" elapsed-min="getElapsedMinutes(resv)" elapsed-perc="getElapsedPercentage(resv)" timer-progress ></span>                                        
                                     </div>
                                 </div>
                             </li>
