@@ -1,3 +1,3 @@
-<div class="w3-progress-container" ng-class="{'w3-black': iElapsedPerc < 100, 'w3-red': iElapsedPerc >= 100}">
-    <div class="w3-green w3-progressbar" style="width:{{100 - iElapsedPerc}}%;">{{iElapsedMin}}min ago</div>   
+<div class="w3-progress-container" ng-class="{'w3-red': iRemainingPerc <= 0, 'w3-black': iRemainingPerc > 0 }">
+    <div class="w3-progressbar" ng-class="{'w3-red': iRemainingPerc <= 5 , 'w3-deep-orange': (iRemainingPerc > 5 && iRemainingPerc <= 20), 'w3-green' : iRemainingPerc > 20}" style="width:{{iRemainingPerc}}%;">{{iRemainingMin | minutesDisplay:'Expired'}}</div>   
 </div>

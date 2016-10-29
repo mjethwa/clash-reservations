@@ -1,0 +1,45 @@
+            .mj-col-button {
+                width:50px;
+                max-width:50px;
+                overflow:hidden;
+                margin:10px;
+            }
+            .mj-col-tag {
+                width:100px;
+                max-width:100px;
+                min-height:40px;
+                overflow:hidden;
+                margin:10px;
+            }
+            .mj-half-scroll{
+                max-height:50vh;
+                overflow-y:scroll;
+            }
+        
+            /*medium*/
+            @media only screen and (min-width:601px){
+                .mj-col-button {
+                    width:55px;
+                    max-width:55px;
+                    overflow:hidden;
+                }
+                .mj-col-tag {
+                    width:120px;
+                    max-width:120px;
+                    overflow:hidden;
+                }
+            }
+            /*large*/
+            @media only screen and (min-width:993px){
+                .mj-col-button {
+                    width:60px;
+                    max-width:60px;
+                    overflow:hidden;
+                }
+                .mj-col-tag {
+                    width:140px;
+                    max-width:140px;
+                    overflow:hidden;
+                }
+            }
+            
