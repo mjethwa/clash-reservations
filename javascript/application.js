@@ -13,12 +13,12 @@
                         return zeroStr;
                     }
 
-                    var out = null;
-                    if (input > 60) {
-                        out = Math.floor(input / 60).toString() + 'h ' + (input % 60).toString() + 'm';
+                    var out = '';
+                    if (input >= 60) {
+                        out = out.concat(Math.floor(input / 60).toString(), 'h ', (input % 60).toString(), 'm');
                     }
                     else {
-                        out = input.toString() + 'm';
+                        out = out.concat(input.toString(), 'm');
                     }
                     
                     return out;
@@ -65,7 +65,10 @@
                     $scope.setResvCode(oArguments["resvCode"], true);
                     
                     $scope.updateServerTime = function () {
-                        $scope.serverTime = (new Date()).getTime();
+                        var newVal = (new Date()).getTime();
+                        if (isFinite($scope.iTimeOffset)) newVal = newVal + ($scope.iTimeOffset * 60000);
+
+                        $scope.serverTime = newVal;
                         $timeout($scope.updateServerTime, 60000);
                     };
                     $scope.updateServerTime(); //trigger the polling
@@ -90,6 +93,8 @@
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iResult
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iResvTime
                     */
+
+                    $scope.iAllocatedMinutes = 120;
                                            
                     $scope.oWarInfo = {
                         sClanName:"Super Clanny",
@@ -241,23 +246,23 @@
 
                     $scope.getElapsedPercentage = function (resv) {
                         var mins = $scope.getElapsedMinutes(resv);
-                        if (mins > 120) mins = 120;
+                        if (mins > $scope.iAllocatedMinutes) mins = $scope.iAllocatedMinutes;
 
-                        return Math.round(((mins * 1.0) / 120) * 100);
+                        return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
                     }
 
                     $scope.getRemainingMinutes = function (resv) {
                         var minsElapsed = $scope.getElapsedMinutes(resv);
 
-                        if (minsElapsed > 120) return 0;
+                        if (minsElapsed > $scope.iAllocatedMinutes) return 0;
 
-                        return (120 - minsElapsed);
+                        return ($scope.iAllocatedMinutes - minsElapsed);
                     };
 
                     $scope.getRemainingPercentage = function (resv) {
                         var mins = $scope.getRemainingMinutes(resv);
 
-                        return Math.round(((mins * 1.0) / 120) * 100);
+                        return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
                     }                    
 
                     $scope.isStarSet = function (starVal) {
