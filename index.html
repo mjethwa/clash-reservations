@@ -25,16 +25,16 @@
 
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
             <div class="w3-container" ng-controller="reserveInitCtrl" ng-if="!oCommonData.sResvCode">
-                <div class="w3-panel" ng-show="isOptionPending()">
+                <div class="w3-panel" ng-if="isOptionPending()">
                     <button class="w3-btn" ng-click="onCreateOption()">Create</button>
                     <button class="w3-btn" ng-click="onJoinOption()">Join</button>
                 </div>
 
-                <div class="w3-panel" ng-show="!isOptionPending()">
+                <div class="w3-panel" ng-if="!isOptionPending()">
                     <button class="w3-btn" ng-click="onCancelOption()"><i class="fa fa-undo"></i></button>
                 </div>
 
-                <div class="w3-panel" ng-show="isOptionCreate()">
+                <div class="w3-panel" ng-if="isOptionCreate()">
                     <input class="w3-input" placeholder="Clan Name" ng-model="sClanName"/>
                     <input class="w3-input" placeholder="Enemy Clan Name" ng-model="sOppositionClanName" />
                     <select class="w3-select" ng-model="iWarSize">
@@ -48,7 +48,7 @@
                     <button class="w3-btn" ng-click="onCreateRequested()">Submit</button>
                 </div>
 
-                <div class="w3-panel" ng-show="isOptionJoin()">
+                <div class="w3-panel" ng-if="isOptionJoin()">
                     <input class="w3-input" placeholder="Reserve Code" ng-model="sInputResvCode"/>
                     <button class="w3-btn" ng-click="onJoinRequested()">Submit</button>
                 </div>
@@ -92,18 +92,18 @@
                 </ul>
              
 
-                <div class="w3-bottom w3-container w3-border w3-padding-16 w3-white" ng-show="oSelectedOpponent">
+                <div class="w3-bottom w3-container w3-border w3-padding-16 w3-white" ng-if="oSelectedOpponent">
                     <button class="w3-btn" ng-click="onDeSelectOpponent()"><i class="fa fa-times"></i></button>
                     <span class="w3-tag w3-padding w3-round-large">Opponent: {{ oSelectedOpponent.sOpponentName }}</span>
 
                     
-                    <div class="w3-panel" ng-show="!oSelectedResv">
+                    <div class="w3-panel" ng-if="!oSelectedResv">
                         <input placeholder="name" ng-model="sName" />
-                        <button class="w3-btn" ng-click="onAddResv()">Add</button>
+                        <button class="w3-btn" ng-click="onAddResv(sName)">Add</button>
                     </div>
 
                     <div class="mj-half-scroll">
-                        <ul class="w3-ul" ng-show="!oSelectedResv">
+                        <ul class="w3-ul" ng-if="!oSelectedResv">
                             <li ng-repeat="resv in oSelectedOpponent.loResvs | orderBy:'$id':true">
                                 <div class="w3-container">
                                     <div class="w3-left mj-col-button">
@@ -121,7 +121,7 @@
                     </div>
 
                     
-                    <div class="w3-panel w3-border" ng-show="oSelectedResv">
+                    <div class="w3-panel w3-border" ng-if="oSelectedResv">
                         <div class="w3-panel">
                             <button class="w3-btn" ng-click="onUpdateResvCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
                             <span class="w3-tag w3-padding w3-round-large">Player: {{ oSelectedResv.sPlayerName }}</span>
