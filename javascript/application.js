@@ -4,6 +4,11 @@
 
             var app = angular.module("reserveApp", ["firebase"]);
 
+            app.constant('RESERVE_CONST',{
+                STARS_PENDING = -1,
+                
+            });
+
             app.filter('minutesDisplay', function() {
                 return function(input, zeroStr) {
                     if (!isFinite(input)) return input;
@@ -217,10 +222,10 @@
                     $scope.onRemoveResvOption = function (resv) {
 
                     };
-                    $scope.onAddResv = function () {
+                    $scope.onAddResv = function (sName) {
                         if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
-                        $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: $scope.sName, iResvTime: $scope.getServerTime(), iResult: -1 });
+                        $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: sName, iResvTime: $scope.getServerTime(), iResult: -1 });
                     };
                     $scope.onSaveResv = function (resv) {
                         //$scope.$apply();
