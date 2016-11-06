@@ -34,13 +34,14 @@ function getCookies() {
     return result;
 }
 
-function setCookie(cKey, cVal) {
+function setCookie(cKey, cVal, oCachedObject) {
     if (typeof (cKey) != "string" || typeof (cVal) != "string") {
         console.log("Attempted to set cookie with non string values");
         return;
     }
     
     document.cookie = cKey + "=" + cVal + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+    if (oCachedObject) oCachedObject[cKey] = cVal;
 }
 
 function getArguments() {
