@@ -44,16 +44,26 @@
                 };
             }]);
 
-            app.controller("reserveCtrl", ["$scope", "$timeout", "$firebaseArray",
-                function ($scope, $timeout, $firebaseArray) {
+            app.controller("reserveCtrl", ["$scope", "$timeout", "$firebaseArray", "$firebaseObject",
+                function ($scope, $timeout, $firebaseArray, $firebaseObject) {
 
                     $scope.blockUi = function() {
                         $scope.bBlockUi = 1;
-                    }
+                    };
 
                     $scope.unBlockUi = function() {
                         $scope.bBlockUi = 0;
-                    }                    
+                    };  
+
+                    $scope.setFbConfig = function(fbConfig) {
+                        setCookie("fb_apiKey", fbConfig.apiKey, oCookies);
+                        setCookie("fb_authDomain", fbConfig.authDomain, oCookies);
+                        setCookie("fb_databaseURL", fbConfig.databaseURL, oCookies);
+                        setCookie("fb_storageBucket", fbConfig.storageBucket, oCookies);
+                        setCookie("fb_messagingSenderId", fbConfig.messagingSenderId, oCookies);
+
+                        $scope.oFbConfig = fbConfig;
+                    };                  
 
                     $scope.setResvCode = function (resvCode, mustExist) {
                         if (!resvCode) return false;
@@ -66,35 +76,73 @@
                         //$scope.unBlockUi();
                         $timeout($scope.unBlockUi, 5000); //simulate delay
                         return true;
-                    }
+                    };
 
                     $scope.createResvCode = function (warInfo) {
 
                         if (!isFinite(warInfo.oWarSize.iSize)) return false;
 
                         $scope.blockUi();
-                        $scope.oWarInfo =  warInfo;
+                        $scope.oWarInfo = warInfo;
                         if (warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
 
                         var oOpponentData = [];
                         for (var i=0; i < warInfo.oWarSize.iSize ; i++) {
-                            oOpponentData.push({ $id: i, sOpponentName: "p".concat( (i + 1).toString()) , loResvs: [] });
+                            oOpponentData.push({ iSeq: i, sOpponentName: "p".concat( (i + 1).toString()) , loResvs: [] });
                         }   
                         $scope.loOpponents = oOpponentData;
 
                         $scope.oCommonData.sResvCode = generateCode();
                         setCookie("resvCode", $scope.oCommonData.sResvCode, oCookies);
 
-                        //$scope.unBlockUi();
-                        $timeout($scope.unBlockUi, 5000); //simulate delay
+
+                        if($scope.bUseFb) {
+                            firebase.database().ref()
+                                .child($scope.oCommonData.sResvCode)
+                                .child('oWarInfo')
+                                //to and from json strips out internal keys
+                                .set(angular.fromJson(angular.toJson($scope.oWarInfo)))
+                                .then(function() {
+                                    $scope.oWarInfo = $firebaseObject(firebase.database().ref()
+                                        .child($scope.oCommonData.sResvCode)
+                                        .child('oWarInfo'));
+                                })
+                                .catch(function(error) {
+
+                                });
+
+                            firebase.database().ref()
+                                .child($scope.oCommonData.sResvCode)
+                                .child('loOpponents')
+                                //to and from json strips out internal keys
+                                .set(angular.fromJson(angular.toJson($scope.loOpponents)))
+                                .then(function() {
+                                    $scope.loOpponents = $firebaseObject(firebase.database().ref()
+                                        .child($scope.oCommonData.sResvCode)
+                                        .child('loOpponents'));
+                                    $scope.unBlockUi();
+                                })
+                                .catch(function(error) {
+                                    $scope.unBlockUi();
+                                });                                
+
+                            //firebase.database().ref().child($scope.oCommonData.sResvCode).set($scope.oWarInfo.sOppositionClanName);
+                            //firebase.database().ref().child($scope.oCommonData.sResvCode).child('oWarInfo').update($scope.oWarInfo);
+                        }
+                        else {
+                            //$scope.unBlockUi();
+                            $timeout($scope.unBlockUi, 5000); //simulate delay
+                        }
+
+
                         return true;
-                    }                    
+                    };                   
 
                     $scope.unsetResvCode = function () {
                         $scope.oCommonData.sResvCode = null;
                         //setCookie("resvCode", '');
                         return true;
-                    }
+                    };
 
                     $scope.oCommonData = { sResvCode: null };
 
@@ -128,15 +176,30 @@
                     {resvCode}/oWarInfo/oTimerType/iMins
 
                                             
-                    {resvCode}/loOpponents/{0-n}/$id  //generated by firebase for Arrays
+                    {resvCode}/loOpponents/{0-n}/iSeq  //generated by firebase for Arrays
                     {resvCode}/loOpponents/{0-n}/sOpponentName
-                    {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/$id   //generated by firebase for Arrays
+                    {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iSeq   //generated by firebase for Arrays
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/sPlayerName
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iResult
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iResvTime
                     */
 
                     $scope.iAllocatedMinutes = 120;
+
+
+                    $scope.oFbConfig = { 
+                        apiKey: oCookies.fb_apiKey,
+                        authDomain: oCookies.fb_authDomain,
+                        databaseURL: oCookies.fb_databaseURL,
+                        storageBucket: oCookies.fb_storageBucket,
+                        messagingSenderId: oCookies.fb_messagingSenderId,
+                    };
+
+
+                    if ($scope.oFbConfig.apiKey && $scope.oFbConfig.databaseURL) {
+                        firebase.initializeApp($scope.oFbConfig);
+                        $scope.bUseFb = 1;                        
+                    }
                                            
                     $scope.oWarInfo = {
                         sClanName:"Super Clanny",
@@ -146,12 +209,12 @@
                     };
                                            
                     $scope.loOpponents = [
-                        { $id: 0, sOpponentName: "p1", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 2, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "James", iResult: -1, iResvTime: $scope.getServerTime() }] },
-                        { $id: 1, sOpponentName: "p2", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 0, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "James", iResult: -1, iResvTime: $scope.getServerTime() }] },
-                        { $id: 2, sOpponentName: "p3", loResvs: [] },
-                        { $id: 3, sOpponentName: "p4", loResvs: [{ $id: 0, sPlayerName: "Joe", iResult: 1, iResvTime: $scope.getServerTime() }] },
-                        { $id: 4, sOpponentName: "p5" },
-                        { $id: 5, sOpponentName: "p6", loResvs: [{ $id: 0, sPlayerName: "Jim", iResult: 1, iResvTime: $scope.getServerTime() }, { $id: 1, sPlayerName: "John", iResult: -1, iResvTime: $scope.getServerTime() }] },
+                        { iSeq: 0, sOpponentName: "p1", loResvs: [{ iSeq: 0, sPlayerName: "Joe", iResult: 2, iResvTime: $scope.getServerTime() }, { iSeq: 1, sPlayerName: "James", iResult: -1, iResvTime: $scope.getServerTime() }] },
+                        { iSeq: 1, sOpponentName: "p2", loResvs: [{ iSeq: 0, sPlayerName: "Joe", iResult: 0, iResvTime: $scope.getServerTime() }, { iSeq: 1, sPlayerName: "James", iResult: -1, iResvTime: $scope.getServerTime() }] },
+                        { iSeq: 2, sOpponentName: "p3", loResvs: [] },
+                        { iSeq: 3, sOpponentName: "p4", loResvs: [{ iSeq: 0, sPlayerName: "Joe", iResult: 1, iResvTime: $scope.getServerTime() }] },
+                        { iSeq: 4, sOpponentName: "p5" },
+                        { iSeq: 5, sOpponentName: "p6", loResvs: [{ iSeq: 0, sPlayerName: "Jim", iResult: 1, iResvTime: $scope.getServerTime() }, { iSeq: 1, sPlayerName: "John", iResult: -1, iResvTime: $scope.getServerTime() }] },
                         ];
                        
                     //configs
@@ -176,6 +239,19 @@
                         {sName:"Fixed 24 Hours" ,sType:"fixed", iMins:1440}
                         ];
  
+                }]);
+
+            app.controller("firebaseConfigCtrl", ["$scope", "$firebaseArray",
+                function ($scope, $firebaseArray) {
+                    $scope.showConfig = function() {
+                        $scope.bShow = 1;
+                    };
+                    
+                    $scope.hideConfig = function() {
+                        $scope.bShow = 0;
+                    };
+
+
                 }]);
 
             app.controller("reserveInitCtrl", ["$scope", "$firebaseArray",
@@ -212,12 +288,12 @@
                         //$scope.oCommonData.sResvCode = generateCode();
                         //$scope.setResvCode(generateCode(), false);
                         $scope.createResvCode(warInfo);
-                    }
+                    };
 
                     $scope.onJoinRequested = function () {
                         //$scope.oCommonData.sResvCode = $scope.sInputResvCode;
                         $scope.setResvCode($scope.sInputResvCode, true);
-                    }
+                    };
 
                 }]);
 
@@ -232,11 +308,11 @@
 
                     $scope.onOpponentSelected = function (opponent) {
                         $scope.oSelectedOpponent = ($scope.oSelectedOpponent == opponent ? null : opponent);
-                    }
+                    };
                     $scope.onDeSelectOpponent = function () {
                         $scope.onUpdateResvCancel();
                         $scope.oSelectedOpponent = null;
-                    }
+                    };
 
                     $scope.onUpdateResvOption = function (resv) {
                         $scope.oSelectedResv = (resv == $scope.oUpdateResv ? null : resv);
@@ -269,7 +345,7 @@
                     $scope.onAddResv = function (sName) {
                         if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
-                        $scope.oSelectedOpponent.loResvs.push({ $id: resvId, sPlayerName: sName, iResvTime: $scope.getServerTime(), iResult: -1 });
+                        $scope.oSelectedOpponent.loResvs.push({ iSeq: resvId, sPlayerName: sName, iResvTime: $scope.getServerTime(), iResult: -1 });
                     };
                     $scope.onSaveResv = function (resv) {
                         //$scope.$apply();
@@ -293,7 +369,7 @@
                         if (mins > $scope.iAllocatedMinutes) mins = $scope.iAllocatedMinutes;
 
                         return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
-                    }
+                    };
 
                     $scope.getRemainingMinutes = function (resv) {
                         var minsElapsed = $scope.getElapsedMinutes(resv);
@@ -307,11 +383,11 @@
                         var mins = $scope.getRemainingMinutes(resv);
 
                         return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
-                    }                    
+                    };                    
 
                     $scope.isStarSet = function (starVal) {
                         return (starVal >= 0);
-                    }
+                    };
 
 
                 }]);
