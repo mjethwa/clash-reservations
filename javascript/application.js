@@ -70,11 +70,47 @@
 
                         $scope.blockUi();
 
-                        $scope.oCommonData.sResvCode = resvCode;
-                        setCookie("resvCode", resvCode, oCookies);
 
-                        //$scope.unBlockUi();
-                        $timeout($scope.unBlockUi, 5000); //simulate delay
+                        if ($scope.bUseFb) {
+
+                            firebase.database().ref()
+                                .child(resvCode)
+                                .child('oWarInfo')
+                                .once('value')
+                                .then(function (snapshot) {
+                                    if (snapshot.val() !== null) {
+                                        $scope.oCommonData.sResvCode = resvCode;
+                                        setCookie("resvCode", resvCode, oCookies);
+
+                                        $scope.oWarInfo = $firebaseObject(firebase.database().ref()
+                                            .child($scope.oCommonData.sResvCode)
+                                            .child('oWarInfo'));
+
+                                        $scope.loOpponents = $firebaseArray(firebase.database().ref()
+                                            .child($scope.oCommonData.sResvCode)
+                                            .child('loOpponents'));
+
+
+                                        //$scope.unBlockUi();
+                                    }
+
+                                    $scope.unBlockUi();
+
+                                })
+                                .catch(function (error) {
+                                    $scope.unBlockUi();
+                                });
+                                  
+
+                        }
+                        else {
+                            //$scope.unBlockUi();
+                            $scope.oCommonData.sResvCode = resvCode;
+                            setCookie("resvCode", resvCode, oCookies);
+
+                            $timeout($scope.unBlockUi, 5000); //simulate delay
+                        }
+
                         return true;
                     };
 
@@ -117,7 +153,7 @@
                                 //to and from json strips out internal keys
                                 .set(angular.fromJson(angular.toJson($scope.loOpponents)))
                                 .then(function() {
-                                    $scope.loOpponents = $firebaseObject(firebase.database().ref()
+                                    $scope.loOpponents = $firebaseArray(firebase.database().ref()
                                         .child($scope.oCommonData.sResvCode)
                                         .child('loOpponents'));
                                     $scope.unBlockUi();
@@ -317,6 +353,8 @@
                     $scope.onUpdateResvOption = function (resv) {
                         $scope.oSelectedResv = (resv == $scope.oUpdateResv ? null : resv);
                         $scope.iStars = resv.iResult;
+
+                        if ($scope.bUseFb) $scope.loOpponents.$save($scope.oSelectedOpponent);
                     };
 
                     $scope.onIncrementStars = function () {
@@ -346,15 +384,21 @@
                         if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
                         $scope.oSelectedOpponent.loResvs.push({ iSeq: resvId, sPlayerName: sName, iResvTime: $scope.getServerTime(), iResult: -1 });
+
+                        if ($scope.bUseFb) $scope.loOpponents.$save($scope.oSelectedOpponent);
                     };
                     $scope.onSaveResv = function (resv) {
                         //$scope.$apply();
                         $scope.oSelectedResv.iResult = $scope.iStars;
                         $scope.oSelectedResv = null;
+
+                        if ($scope.bUseFb) $scope.loOpponents.$save($scope.oSelectedOpponent);
                     };
                     $scope.onRenewResv = function (resv) {
                         $scope.oSelectedResv.iResvTime = $scope.getServerTime();
                         $scope.oSelectedResv = null;
+
+                        if ($scope.bUseFb) $scope.loOpponents.$save($scope.oSelectedOpponent);
                     };
                     $scope.onUpdateResvCancel = function (resv) {
                         $scope.oSelectedResv = null;
