@@ -326,9 +326,9 @@
                         $scope.createResvCode(warInfo);
                     };
 
-                    $scope.onJoinRequested = function () {
+                    $scope.onJoinRequested = function (resvCode) {
                         //$scope.oCommonData.sResvCode = $scope.sInputResvCode;
-                        $scope.setResvCode($scope.sInputResvCode, true);
+                        $scope.setResvCode(resvCode, true);
                     };
 
                 }]);

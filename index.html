@@ -18,10 +18,10 @@
         <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
 
         <!--Local resources-->
-        <link rel="stylesheet" href="css/w3.css?v=20161111_1620" />
-        <link rel="stylesheet" href="css/style.css?v=20161111_1620" />        
-        <script src="javascript/lib.js?v=20161111_1620"></script>
-        <script src="javascript/application.js?v=20161111_1620"></script>
+        <link rel="stylesheet" href="css/w3.css?v=20161111_1800" />
+        <link rel="stylesheet" href="css/style.css?v=20161111_1800" />        
+        <script src="javascript/lib.js?v=20161111_1800"></script>
+        <script src="javascript/application.js?v=20161111_1800"></script>
     </head>
     <body>
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
@@ -72,7 +72,7 @@
 
                 <div class="w3-panel" ng-if="isOptionJoin()">
                     <input class="w3-input" placeholder="Reserve Code" ng-model="sInputResvCode"/>
-                    <button class="w3-btn" ng-click="onJoinRequested()">Submit</button>
+                    <button class="w3-btn" ng-click="onJoinRequested(sInputResvCode)">Submit</button>
                 </div>
 
             </div>
