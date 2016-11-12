@@ -18,10 +18,10 @@
         <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
 
         <!--Local resources-->
-        <link rel="stylesheet" href="css/w3.css?v=20161112_1800" />
-        <link rel="stylesheet" href="css/style.css?v=20161112_1800" />        
-        <script src="javascript/lib.js?v=20161112_1800"></script>
-        <script src="javascript/application.js?v=20161112_1800"></script>
+        <link rel="stylesheet" href="css/w3.css?v=20161112_2230" />
+        <link rel="stylesheet" href="css/style.css?v=20161112_2230" />        
+        <script src="javascript/lib.js?v=20161112_2230"></script>
+        <script src="javascript/application.js?v=20161112_2230"></script>
     </head>
     <body>
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
@@ -93,9 +93,7 @@
                             <div class="w3-left w3-tag w3-round-large mj-col-tag">
                                 <div class="">
                                     <span>{{ $index }}. {{ opponent.sOpponentName }} : </span>
-                                    <div ng-repeat="resv in opponent.loResvs | orderBy:'iResult':true | limitTo:1">
-                                        <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div>                                        
-                                    </div>
+                                    <div stars="getBestScore(opponent)" rating-stars></div>                                        
                                 </div>
                             </div>
                             <div class="w3-left">
@@ -126,7 +124,7 @@
 
                         <div class="mj-half-scroll">
                             <ul class="w3-ul" ng-if="!oSelectedResv">
-                                <li ng-repeat="resv in oSelectedOpponent.loResvs | orderBy:'$id':true">
+                                <li ng-repeat="resv in loEditResvs">
                                     <div class="w3-container">
                                         <div class="w3-left mj-col-button">
                                             <button class="w3-btn" ng-click="onUpdateResvOption(resv)"><i class="fa fa-pencil"></i></button>
