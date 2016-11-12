@@ -419,11 +419,13 @@
 
                     };
                     $scope.onAddResv = function (sName) {
+                        if (!sName) return false;
                         if (!$scope.oSelectedOpponent.loResvs) $scope.oSelectedOpponent.loResvs = [];
                         var resvId = $scope.oSelectedOpponent.loResvs.length;
                         $scope.oSelectedOpponent.loResvs.push({ iSeq: resvId, sPlayerName: sName, iResvTime: $scope.getServerTime(), iResult: -1 });
 
                         if ($scope.bUseFb) $scope.loOpponents.$save($scope.oSelectedOpponent);
+                        return true;
                     };
                     $scope.onSaveResv = function (resv) {
                         //$scope.$apply();
