@@ -78,24 +78,29 @@
                                 .child('oWarInfo')
                                 .once('value')
                                 .then(function (snapshot) {
-                                    if (snapshot.val() !== null) {
-                                        $scope.oCommonData.sResvCode = resvCode;
-                                        setCookie("resvCode", resvCode, oCookies);
+                                    $scope.$apply(function() {
+                                        if (snapshot.val() !== null) {
+                                            var warInfo = snapshot.val();
 
-                                        $scope.oWarInfo = $firebaseObject(firebase.database().ref()
-                                            .child($scope.oCommonData.sResvCode)
-                                            .child('oWarInfo'));
+                                            $scope.oCommonData.sResvCode = resvCode;
+                                            setCookie("resvCode", resvCode, oCookies);
 
-                                        $scope.loOpponents = $firebaseArray(firebase.database().ref()
-                                            .child($scope.oCommonData.sResvCode)
-                                            .child('loOpponents'));
+                                            $scope.oWarInfo = $firebaseObject(firebase.database().ref()
+                                                .child($scope.oCommonData.sResvCode)
+                                                .child('oWarInfo'));
+
+                                            if (warInfo.oTimerType && warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
+
+                                            $scope.loOpponents = $firebaseArray(firebase.database().ref()
+                                                .child($scope.oCommonData.sResvCode)
+                                                .child('loOpponents'));
 
 
-                                        //$scope.unBlockUi();
-                                    }
+                                            //$scope.unBlockUi();
+                                        }
 
-                                    $scope.unBlockUi();
-
+                                        $scope.unBlockUi();
+                                    });
                                 })
                                 .catch(function (error) {
                                     $scope.unBlockUi();
@@ -120,7 +125,7 @@
 
                         $scope.blockUi();
                         $scope.oWarInfo = warInfo;
-                        if (warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
+                        if (warInfo.oTimerType && warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
 
                         var oOpponentData = [];
                         for (var i=0; i < warInfo.oWarSize.iSize ; i++) {
@@ -139,28 +144,32 @@
                                 //to and from json strips out internal keys
                                 .set(angular.fromJson(angular.toJson($scope.oWarInfo)))
                                 .then(function() {
-                                    $scope.oWarInfo = $firebaseObject(firebase.database().ref()
+
+                                    firebase.database().ref()
                                         .child($scope.oCommonData.sResvCode)
-                                        .child('oWarInfo'));
+                                        .child('loOpponents')
+                                        //to and from json strips out internal keys
+                                        .set(angular.fromJson(angular.toJson($scope.loOpponents)))
+                                        .then(function() {
+
+                                            $scope.oWarInfo = $firebaseObject(firebase.database().ref()
+                                                .child($scope.oCommonData.sResvCode)
+                                                .child('oWarInfo'));
+
+                                            $scope.loOpponents = $firebaseArray(firebase.database().ref()
+                                                .child($scope.oCommonData.sResvCode)
+                                                .child('loOpponents'));
+                                            $scope.unBlockUi();
+                                        })
+                                        .catch(function(error) {
+                                            $scope.unBlockUi();
+                                        });                                          
                                 })
                                 .catch(function(error) {
-
+                                    $scope.unBlockUi();
                                 });
 
-                            firebase.database().ref()
-                                .child($scope.oCommonData.sResvCode)
-                                .child('loOpponents')
-                                //to and from json strips out internal keys
-                                .set(angular.fromJson(angular.toJson($scope.loOpponents)))
-                                .then(function() {
-                                    $scope.loOpponents = $firebaseArray(firebase.database().ref()
-                                        .child($scope.oCommonData.sResvCode)
-                                        .child('loOpponents'));
-                                    $scope.unBlockUi();
-                                })
-                                .catch(function(error) {
-                                    $scope.unBlockUi();
-                                });                                
+                              
 
                             //firebase.database().ref().child($scope.oCommonData.sResvCode).set($scope.oWarInfo.sOppositionClanName);
                             //firebase.database().ref().child($scope.oCommonData.sResvCode).child('oWarInfo').update($scope.oWarInfo);
@@ -184,9 +193,37 @@
 
                     $scope.setResvCode(oArguments["resvCode"], true);
                     
+                    $scope.deriveFbServerTimeOffset = function () {
+                        firebase.database().ref()
+                            .child("iServerTime")
+                            .set(firebase.database.ServerValue.TIMESTAMP)
+                            .then(function () {
+                                firebase.database().ref()
+                                    .child("iServerTime")
+                                    .once('value')
+                                    .then(function(snapshot) {
+                                        if (isFinite(snapshot.val())) {
+                                            $scope.iTimeOffset = snapshot.val() - (new Date()).getTime();
+
+                                            $timeout($scope.updateServerTime, 3600000);
+                                        }
+                                        else {
+                                            $timeout($scope.updateServerTime, 10000);
+                                        }
+                                    })
+                                    .catch(function(error) {
+                                        $timeout($scope.updateServerTime, 10000);
+                                    });
+
+                            })
+                            .catch(function (error) {
+                                $timeout($scope.updateServerTime, 10000);
+                            });
+                    };
+
                     $scope.updateServerTime = function () {
                         var newVal = (new Date()).getTime();
-                        if (isFinite($scope.iTimeOffset)) newVal = newVal + ($scope.iTimeOffset * 60000);
+                        if (isFinite($scope.iTimeOffset)) newVal = newVal + ($scope.iTimeOffset);
 
                         $scope.serverTime = newVal;
                         $timeout($scope.updateServerTime, 60000);
@@ -234,7 +271,8 @@
 
                     if ($scope.oFbConfig.apiKey && $scope.oFbConfig.databaseURL) {
                         firebase.initializeApp($scope.oFbConfig);
-                        $scope.bUseFb = 1;                        
+                        $scope.bUseFb = 1;
+                        $scope.deriveFbServerTimeOffset(); //trigger the polling                        
                     }
                                            
                     $scope.oWarInfo = {
