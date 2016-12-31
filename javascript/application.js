@@ -125,7 +125,24 @@
                         if (!isFinite(warInfo.oWarSize.iSize)) return false;
 
                         $scope.blockUi();
-                        $scope.oWarInfo = warInfo;
+
+                        //create a copy to remove the invalid keys for now
+                        var oSafeWarInfo = {};
+                        oSafeWarInfo.sClanName = warInfo.sClanName;
+                        oSafeWarInfo.sOppositionClanName = warInfo.sOppositionClanName; 
+                        if (warInfo.oWarInfo) {
+                            oSafeWarInfo.oWarSize = {};
+                            if (warInfo.oWarSize.iSize) oSafeWarInfo.oWarSize.iSize = warInfo.oWarSize.iSize;
+                            if (warInfo.oWarSize.sName) oSafeWarInfo.oWarSize.sName = warInfo.oWarSize.sName;  
+                        }
+                        if (warInfo.oTimerType) {
+                            oSafeWarInfo.oTimerType = {};  
+                            if (warInfo.oTimerType.sName) oSafeWarInfo.oTimerType.sName = warInfo.oTimerType.sName; 
+                            if (warInfo.oTimerType.sType) oSafeWarInfo.oTimerType.sType = warInfo.oTimerType.sType; 
+                            if (warInfo.oTimerType.iTime) oSafeWarInfo.oTimerType.iTime = warInfo.oTimerType.iTime;  
+                        }              
+
+                        $scope.oWarInfo = oSafeWarInfo;
                         if (warInfo.oTimerType && warInfo.oTimerType.iTime) $scope.iAllocatedTime = warInfo.oTimerType.iTime;
 
                         var oOpponentData = [];
@@ -143,14 +160,14 @@
                                 .child($scope.oCommonData.sResvCode)
                                 .child('oWarInfo')
                                 //to and from json strips out internal keys
-                                .set(angular.fromJson(angular.toJson($scope.oWarInfo)))
+                                .set($scope.stripInvalidKeys($scope.oWarInfo))
                                 .then(function() {
 
                                     firebase.database().ref()
                                         .child($scope.oCommonData.sResvCode)
                                         .child('loOpponents')
                                         //to and from json strips out internal keys
-                                        .set(angular.fromJson(angular.toJson($scope.loOpponents)))
+                                        .set($scope.stripInvalidKeys($scope.loOpponents))
                                         .then(function() {
 
                                             $scope.oWarInfo = $firebaseObject(firebase.database().ref()
@@ -183,6 +200,13 @@
 
                         return true;
                     };                   
+
+                    $scope.stripInvalidKeys = function (obj) {
+
+                        var newObj = angular.fromJson(angular.toJson(obj));
+                        
+                        return newObj;
+                    };
 
                     $scope.unsetResvCode = function () {
                         $scope.oCommonData.sResvCode = null;
@@ -241,10 +265,8 @@
                      
                     {resvCode}/oWarInfo/sClanName
                     {resvCode}/oWarInfo/sOppositionClanName
-                    {resvCode}/oWarInfo/iWarSize
                     {resvCode}/oWarInfo/oWarSize/iSize
                     {resvCode}/oWarInfo/oWarSize/sName
-                    {resvCode}/oWarInfo/sTimerType
                     {resvCode}/oWarInfo/oTimerType/sName
                     {resvCode}/oWarInfo/oTimerType/sType
                     {resvCode}/oWarInfo/oTimerType/iTime
