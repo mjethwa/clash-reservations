@@ -18,10 +18,10 @@
         <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
 
         <!--Local resources-->
-        <link rel="stylesheet" href="css/w3.css?v=20161112_2230" />
-        <link rel="stylesheet" href="css/style.css?v=20161112_2230" />        
-        <script src="javascript/lib.js?v=20161112_2230"></script>
-        <script src="javascript/application.js?v=20161112_2230"></script>
+        <link rel="stylesheet" href="css/w3.css?v=20161231_1655" />
+        <link rel="stylesheet" href="css/style.css?v=20161231_1655" />        
+        <script src="javascript/lib.js?v=20161231_1655"></script>
+        <script src="javascript/application.js?v=20161231_1655"></script>
     </head>
     <body>
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
@@ -102,7 +102,7 @@
                                         <div class="">
                                             <span>{{resv.sPlayerName}}:</span>
                                             <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div>
-                                            <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-min="getRemainingMinutes(resv)" remaining-perc="getRemainingPercentage(resv)"  timer-progress ></div>
+                                            <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-time="getRemainingTime(resv)" remaining-perc="getRemainingPercentage(resv)"  timer-progress ></div>
                                         </div>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                                         <div class="w3-left w3-tag w3-round-medium w3-dark-grey mj-col-tag">
                                             <span>{{resv.sPlayerName}}:</span>
                                             <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div> 
-                                            <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-min="getRemainingMinutes(resv)" remaining-perc="getRemainingPercentage(resv)" timer-progress ></div>                                        
+                                            <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-time="getRemainingTime(resv)" remaining-perc="getRemainingPercentage(resv)" timer-progress ></div>                                        
                                         </div>
                                     </div>
                                 </li>

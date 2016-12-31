@@ -13,12 +13,13 @@
                         return zeroStr;
                     }
 
+                    var mins = Math.floor(input / 60000);
                     var out = '';
-                    if (input >= 60) {
-                        out = out.concat(Math.floor(input / 60).toString(), 'h ', (input % 60).toString(), 'm');
+                    if (mins >= 60) {
+                        out = out.concat(Math.floor(mins / 60).toString(), 'h ', (mins % 60).toString(), 'm');
                     }
                     else {
-                        out = out.concat(input.toString(), 'm');
+                        out = out.concat(mins.toString(), 'm');
                     }
                     
                     return out;
@@ -37,7 +38,7 @@
             app.directive('timerProgress', ["minutesDisplayFilter", function(minutesDisplayFilter) {
                 return {
                     scope: {
-                        iRemainingMin: '=remainingMin',
+                        iRemainingTime: '=remainingTime',
                         iRemainingPerc: '=remainingPerc'
                     },
                     templateUrl: 'templates/timer-progress.html'
@@ -89,7 +90,7 @@
                                                 .child($scope.oCommonData.sResvCode)
                                                 .child('oWarInfo'));
 
-                                            if (warInfo.oTimerType && warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
+                                            if (warInfo.oTimerType && warInfo.oTimerType.iTime) $scope.iAllocatedTime = warInfo.oTimerType.iTime;
 
                                             $scope.loOpponents = $firebaseArray(firebase.database().ref()
                                                 .child($scope.oCommonData.sResvCode)
@@ -125,7 +126,7 @@
 
                         $scope.blockUi();
                         $scope.oWarInfo = warInfo;
-                        if (warInfo.oTimerType && warInfo.oTimerType.iMins) $scope.iAllocatedMinutes = warInfo.oTimerType.iMins;
+                        if (warInfo.oTimerType && warInfo.oTimerType.iTime) $scope.iAllocatedTime = warInfo.oTimerType.iTime;
 
                         var oOpponentData = [];
                         for (var i=0; i < warInfo.oWarSize.iSize ; i++) {
@@ -246,7 +247,7 @@
                     {resvCode}/oWarInfo/sTimerType
                     {resvCode}/oWarInfo/oTimerType/sName
                     {resvCode}/oWarInfo/oTimerType/sType
-                    {resvCode}/oWarInfo/oTimerType/iMins
+                    {resvCode}/oWarInfo/oTimerType/iTime
 
                                             
                     {resvCode}/loOpponents/{0-n}/iSeq 
@@ -257,7 +258,7 @@
                     {resvCode}/loOpponents/{0-n}/loResvs/{0-n}/iResvTime
                     */
 
-                    $scope.iAllocatedMinutes = 120;
+                    $scope.iAllocatedTime = 120 * 60 * 1000;
 
 
                     $scope.oFbConfig = { 
@@ -279,7 +280,7 @@
                         sClanName:"Super Clanny",
                         sOppositionClanName:null,
                         oWarSize:{iSize:15, sName:"15 v 15"},
-                        oTimerType:{sName:"Fixed 1 Hour" ,sType:"fixed", iMins:60}
+                        oTimerType:{sName:"Fixed 1 Hour" ,sType:"fixed", iTime:(60 * 60000)}
                     };
                                            
                     $scope.loOpponents = [
@@ -302,15 +303,15 @@
                         {iSize:50, sName:"50 v 50"}
                         ];
                     $scope.loTimerTypes = [
-                        {sName:"Fixed 30 Mins" ,sType:"fixed", iMins:30},
-                        {sName:"Fixed 1 Hour" ,sType:"fixed", iMins:60},
-                        {sName:"Fixed 2 Hours" ,sType:"fixed", iMins:120},
-                        {sName:"Fixed 3 Hours" ,sType:"fixed", iMins:180},
-                        {sName:"Fixed 4 Hours" ,sType:"fixed", iMins:240},
-                        {sName:"Fixed 5 Hours" ,sType:"fixed", iMins:300},
-                        {sName:"Fixed 6 Hours" ,sType:"fixed", iMins:360},
-                        {sName:"Fixed 12 Hours" ,sType:"fixed", iMins:720},
-                        {sName:"Fixed 24 Hours" ,sType:"fixed", iMins:1440}
+                        {sName:"Fixed 30 Mins" ,sType:"fixed", iTime:(30 * 60000)},
+                        {sName:"Fixed 1 Hour" ,sType:"fixed", iTime:(60 * 60000)},
+                        {sName:"Fixed 2 Hours" ,sType:"fixed", iTime:(120 * 60000)},
+                        {sName:"Fixed 3 Hours" ,sType:"fixed", iTime:(180 * 60000)},
+                        {sName:"Fixed 4 Hours" ,sType:"fixed", iTime:(240 * 60000)},
+                        {sName:"Fixed 5 Hours" ,sType:"fixed", iTime:(300 * 60000)},
+                        {sName:"Fixed 6 Hours" ,sType:"fixed", iTime:(360 * 60000)},
+                        {sName:"Fixed 12 Hours" ,sType:"fixed", iTime:(720 * 60000)},
+                        {sName:"Fixed 24 Hours" ,sType:"fixed", iTime:(1440 * 60000)}
                         ];
  
                 }]);
@@ -480,29 +481,29 @@
                         $scope.oSelectedResv = null;
                     };
 
-                    $scope.getElapsedMinutes = function (resv) {
-                        return Math.floor(($scope.getServerTime() - resv.iResvTime) / 60000);
-                    };
+                    $scope.getElapsedTime = function (resv) {
+                        return $scope.getServerTime() - resv.iResvTime;
+                    };                    
 
                     $scope.getElapsedPercentage = function (resv) {
-                        var mins = $scope.getElapsedMinutes(resv);
-                        if (mins > $scope.iAllocatedMinutes) mins = $scope.iAllocatedMinutes;
+                        var elapsedTime = $scope.getElapsedTime(resv);
+                        if (elapsedTime > $scope.iAllocatedTime) elapsedTime = $scope.iAllocatedTime;
 
-                        return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
+                        return Math.round(((elapsedTime * 1.0) / $scope.iAllocatedTime) * 100);
                     };
 
-                    $scope.getRemainingMinutes = function (resv) {
-                        var minsElapsed = $scope.getElapsedMinutes(resv);
+                     $scope.getRemainingTime = function (resv) {
+                        var elapsedTime = $scope.getElapsedTime(resv);
 
-                        if (minsElapsed > $scope.iAllocatedMinutes) return 0;
+                        if (elapsedTime > $scope.iAllocatedTime) return 0;
 
-                        return ($scope.iAllocatedMinutes - minsElapsed);
-                    };
+                        return ($scope.iAllocatedTime - elapsedTime);
+                    };                   
 
                     $scope.getRemainingPercentage = function (resv) {
-                        var mins = $scope.getRemainingMinutes(resv);
+                        var remainingTime = $scope.getRemainingTime(resv);
 
-                        return Math.round(((mins * 1.0) / $scope.iAllocatedMinutes) * 100);
+                        return Math.round(((remainingTime * 1.0) / $scope.iAllocatedTime) * 100);
                     };                    
 
                     $scope.isStarSet = function (starVal) {
