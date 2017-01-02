@@ -18,10 +18,10 @@
         <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
 
         <!--Local resources-->
-        <link rel="stylesheet" href="css/w3.css?v=20161231_1758" />
-        <link rel="stylesheet" href="css/style.css?v=20161231_1758" />        
-        <script src="javascript/lib.js?v=20161231_1758"></script>
-        <script src="javascript/application.js?v=20161231_1758"></script>
+        <link rel="stylesheet" href="css/w3.css?v=20170102_1855" />
+        <link rel="stylesheet" href="css/style.css?v=20170102_1855" />        
+        <script src="javascript/lib.js?v=20170102_1855"></script>
+        <script src="javascript/application.js?v=20170102_1855"></script>
     </head>
     <body>
         <div ng-app="reserveApp" ng-controller="reserveCtrl">
@@ -31,10 +31,10 @@
                 </div>
             </div>
 
-            <div class="w3-container" ng-controller="firebaseConfigCtrl">
+            <div class="mj-panel" ng-controller="firebaseConfigCtrl">
                 <button class="w3-btn" ng-click="showConfig()">FB Config</button>
                 <div class="w3-modal" style="display:block;" ng-if="bShow">
-                    <div class="w3-modal-content w3-panel">
+                    <div class="w3-modal-content mj-panel mj-padding-l">
                         <button class="w3-btn" ng-click="hideConfig()">X</button>
                         <br/>
                         <input class="w3-input" placeholder="API key" ng-model="oFbConfig.apiKey"/>
@@ -48,17 +48,17 @@
                 </div>
             </div>
 
-            <div class="w3-container" ng-controller="reserveInitCtrl" ng-if="!oCommonData.sResvCode">
-                <div class="w3-panel" ng-if="isOptionPending()">
+            <div class="mj-panel mj-padding-l mj-margin-tb" ng-controller="reserveInitCtrl" ng-if="!oCommonData.sResvCode">
+                <div class="mj-panel" ng-if="isOptionPending()">
                     <button class="w3-btn" ng-click="onCreateOption()">Create</button>
                     <button class="w3-btn" ng-click="onJoinOption()">Join</button>
                 </div>
 
-                <div class="w3-panel" ng-if="!isOptionPending()">
+                <div class="mj-panel" ng-if="!isOptionPending()">
                     <button class="w3-btn" ng-click="onCancelOption()"><i class="fa fa-undo"></i></button>
                 </div>
 
-                <div class="w3-panel" ng-if="isOptionCreate()">
+                <div class="mj-panel" ng-if="isOptionCreate()">
                     <input class="w3-input" placeholder="Clan Name" ng-model="oWarInfo.sClanName"/>
                     <input class="w3-input" placeholder="Enemy Clan Name" ng-model="oWarInfo.sOppositionClanName" />
                     <select class="w3-select" ng-options="item as item.sName for item in loWarSizes" ng-model="oWarInfo.oWarSize">
@@ -70,62 +70,60 @@
                     <button class="w3-btn" ng-click="onCreateRequested(oWarInfo)">Submit</button>
                 </div>
 
-                <div class="w3-panel" ng-if="isOptionJoin()">
+                <div class="mj-panel" ng-if="isOptionJoin()">
                     <input class="w3-input" placeholder="Reserve Code" ng-model="sInputResvCode"/>
                     <button class="w3-btn" ng-click="onJoinRequested(sInputResvCode)">Submit</button>
                 </div>
 
             </div>
-            <div class="w3-container" ng-controller="reserveListCtrl" ng-if="oCommonData.sResvCode">
-                <div class="w3-panel">
+            <div class="mj-panel mj-margin-tb" ng-controller="reserveListCtrl" ng-if="oCommonData.sResvCode">
+                <div class="mj-panel mj-margin-tb">
                     <button class="w3-btn" ng-click="onLeaveOption()"><i class="fa fa-undo"></i></button>
+                    <br/>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">Code {{ oCommonData.sResvCode }}</span>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">{{ (oWarInfo.sClanName ? oWarInfo.sClanName : "Your Clan" ) }} v {{ (oWarInfo.sOppositionClanName ? oWarInfo.sOppositionClanName : "Opposition") }}</span>
                     <span class="w3-tag w3-padding w3-margin-top w3-round-large">Timer {{ oWarInfo.oTimerType.sName }}</span>
                 </div>
-                
-                <ul class="w3-ul">
-                    <li ng-repeat="opponent in loOpponents">
-                        <div class="w3-container"  >
-                            <div class="w3-left mj-col-button">
-                                <a class="w3-btn" ng-click="onOpponentSelected(opponent)"><i class="fa fa-pencil"></i></a>
-                            </div>  
-                            <div class="w3-left w3-tag w3-round-large mj-col-tag">
-                                <div class="">
-                                    <span>{{ $index }}. {{ opponent.sOpponentName }} : </span>
-                                    <div stars="getBestScore(opponent)" rating-stars></div>                                        
-                                </div>
-                            </div>
-                            <div class="w3-left">
-                                <div class="w3-container">
-                                    <div class="w3-left w3-tag w3-round-medium w3-dark-grey mj-col-tag" ng-repeat="resv in opponent.loResvs">
-                                        <div class="">
-                                            <span>{{resv.sPlayerName}}:</span>
-                                            <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div>
-                                            <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-time="getRemainingTime(resv)" remaining-perc="getRemainingPercentage(resv)"  timer-progress ></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+                <div class="mj-panel mj-padding-l" ng-repeat="opponent in loOpponents">
+                    <div class="mj-rule"></div>
+                    <div class="mj-panel"  >
+                        <div class="w3-left mj-col-button">
+                            <a class="w3-btn" ng-click="onOpponentSelected(opponent)"><i class="fa fa-pencil"></i></a>
                         </div>  
-                    </li>
-                </ul>
+                        <div class="w3-left w3-tag w3-round-large mj-col-tag">
+                            <div class="">
+                                <span>{{ $index }}. {{ opponent.sOpponentName }} : </span>
+                                <div stars="getBestScore(opponent)" rating-stars></div>                                        
+                            </div>
+                        </div>
+                        <div class="w3-left w3-tag w3-round-medium w3-dark-grey mj-col-tag" ng-repeat="resv in opponent.loResvs">
+                            <div class="">
+                                <span>{{resv.sPlayerName}}:</span>
+                                <div ng-if="isStarSet(resv.iResult)" stars="resv.iResult" rating-stars></div>
+                                <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-time="getRemainingTime(resv)" remaining-perc="getRemainingPercentage(resv)"  timer-progress ></div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
              
                 <div class="w3-modal" style="display:block;" ng-if="oSelectedOpponent">
-                    <div class="w3-modal-content w3-container w3-border w3-padding-16 w3-white" ng-if="oSelectedOpponent">
+                    <div class="w3-modal-content mj-panel mj-padding-l w3-border w3-white" ng-if="oSelectedOpponent">
                         <button class="w3-btn" ng-click="onDeSelectOpponent()"><i class="fa fa-times"></i></button>
+                        <br/>
                         <span class="w3-tag w3-padding w3-round-large">Opponent: {{ oSelectedOpponent.sOpponentName }}</span>
 
                         
-                        <div class="w3-panel" ng-if="!oSelectedResv">
+                        <div class="mj-panel mj-margin-tb" ng-if="!oSelectedResv">
                             <input placeholder="name" ng-model="sName" />
                             <button class="w3-btn" ng-click="onAddResv(sName)">Add</button>
                         </div>
 
-                        <div class="mj-half-scroll">
-                            <ul class="w3-ul" ng-if="!oSelectedResv">
-                                <li ng-repeat="resv in loEditResvs">
-                                    <div class="w3-container">
+                        <div class="mj-half-scroll mj-panel mj-margin-tb">
+                            <div class="mj-panel" ng-if="!oSelectedResv">
+                                <div class="mj-panel mj-padding-l" ng-repeat="resv in loEditResvs">
+                                    <div class="mj-rule"></div>
+                                    <div class="mj-panel">
                                         <div class="w3-left mj-col-button">
                                             <button class="w3-btn" ng-click="onUpdateResvOption(resv)"><i class="fa fa-pencil"></i></button>
                                         </div>
@@ -136,17 +134,20 @@
                                             <div ng-if="!isStarSet(resv.iResult) && resv.iResvTime" remaining-time="getRemainingTime(resv)" remaining-perc="getRemainingPercentage(resv)" timer-progress ></div>                                        
                                         </div>
                                     </div>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                         </div>
 
                         
-                        <div class="w3-panel w3-border" ng-if="oSelectedResv">
-                            <div class="w3-panel">
-                                <button class="w3-btn" ng-click="onUpdateResvCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
-                                <span class="w3-tag w3-padding w3-round-large">Player: {{ oSelectedResv.sPlayerName }}</span>
-                            </div>
-                            <div class="w3-panel">
+                        <div class="mj-panel mj-margin-tb" ng-if="oSelectedResv">
+
+                            <button class="w3-btn" ng-click="onUpdateResvCancel(oSelectedResv)"><i class="fa fa-undo"></i></button>
+                            <br/>
+                            <span class="w3-tag w3-padding w3-round-large">Player: {{ oSelectedResv.sPlayerName }}</span>
+                            <br/>
+                            <br/>
+                            <div class="mj-rule"></div>
+                            <div class="mj-panel mj-margin-tb">
                                 <button class="w3-btn" ng-click="onDecrementStars()" ng-class="{'w3-dark-grey' : !isStarSet(iStars)}">-</button>
                                 <!--<input placeholder="stars" ng-model="iStars" readonly></input>-->
                                 <span>
@@ -157,9 +158,13 @@
                                 <button class="w3-btn" ng-click="onIncrementStars()" ng-class="{'w3-dark-grey' : (iStars > 2)}">+</button>
                                 <button class="w3-btn" ng-click="onSaveResv(oSelectedResv)">Save</button>
                             </div>
-                            <div class="w3-panel">
+                            <div class="mj-rule"></div>
+                            <div class="mj-panel mj-margin-tb">
                                 <button class="w3-btn" ng-click="onRenewResv(oSelectedResv)">Renew</button>
-                                <button class="w3-btn" ng-click="onRemoveResvOption(oSelectedResv)">Remove</button>
+                            </div>
+                            <div class="mj-rule"></div>
+                            <div class="mj-panel mj-margin-tb">
+                                <button class="w3-btn" ng-click="onRemoveResvOption(oSelectedResv)">Remove</button>                                
                             </div>
                         </div>
 

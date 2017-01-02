@@ -2,7 +2,7 @@
                 width:50px;
                 max-width:50px;
                 overflow:hidden;
-                margin:5px;
+                margin: 10px 5px 10px 5px;
             }
             .mj-col-tag {
                 width:100px;
@@ -15,7 +15,54 @@
                 max-height:50vh;
                 overflow-y:scroll;
             }
-        
+
+
+
+            .mj-panel {
+                /*width:100%;*/
+            }
+
+            .mj-rule {
+                height:2px;
+                background-color: lightgray;
+            }
+
+            .mj-panel:after, mj-rule:after {
+                content:"";display:table;clear:both;
+            }            
+
+            .mj-margin-t {
+                margin: 16px 0 0 0;
+            }
+            .mj-margin-tb {
+                margin: 16px 0 16px 0;
+            }            
+            .mj-margin-l {
+                margin: 0 0 0 16px;
+            }
+            .mj-margin-rl {
+                margin: 0 16px 0 16px;
+            }                        
+            .mj-margin-trbl {
+                margin: 16px 16px 16px 16px;
+            }  
+
+            .mj-padding-t {
+                padding: 16px 0 0 0;
+            }
+            .mj-padding-tb {
+                padding: 16px 0 16px 0;
+            }            
+            .mj-padding-l {
+                padding: 0 0 0 16px;
+            }
+            .mj-padding-rl {
+                padding: 0 16px 0 16px;
+            }                        
+            .mj-padding-trbl {
+                padding: 16px 16px 16px 16px;
+            }             
+
             /*medium*/
             @media only screen and (min-width:601px){
                 .mj-col-button {
