@@ -1,15 +1,15 @@
             .mj-col-button {
-                width:50px;
+                /*width:50px;*/
                 max-width:50px;
                 overflow:hidden;
-                margin: 10px 5px 10px 5px;
+                margin: 10px 0 0 0;
             }
             .mj-col-tag {
                 width:100px;
                 max-width:100px;
                 min-height:40px;
                 overflow:hidden;
-                margin:10px;
+                margin:10px 0 0 10px;
             }
             .mj-half-scroll{
                 max-height:50vh;
@@ -32,44 +32,42 @@
             }            
 
             .mj-margin-t {
-                margin: 16px 0 0 0;
+                margin: 10px 0 0 0;
             }
             .mj-margin-tb {
-                margin: 16px 0 16px 0;
-            }            
+                margin: 10px 0 10px 0;
+            } 
+            .mj-margin-tl {
+                margin: 10px 0 0 10px;
+            }                       
             .mj-margin-l {
-                margin: 0 0 0 16px;
+                margin: 0 0 0 10px;
             }
             .mj-margin-rl {
-                margin: 0 16px 0 16px;
+                margin: 0 10px 0 10px;
             }                        
             .mj-margin-trbl {
-                margin: 16px 16px 16px 16px;
+                margin: 10px 10px 10px 10px;
             }  
 
             .mj-padding-t {
-                padding: 16px 0 0 0;
+                padding: 10px 0 0 0;
             }
             .mj-padding-tb {
-                padding: 16px 0 16px 0;
+                padding: 10px 0 10px 0;
             }            
             .mj-padding-l {
-                padding: 0 0 0 16px;
+                padding: 0 0 0 10px;
             }
             .mj-padding-rl {
-                padding: 0 16px 0 16px;
+                padding: 0 10px 0 10px;
             }                        
             .mj-padding-trbl {
-                padding: 16px 16px 16px 16px;
+                padding: 10px 10px 10px 10px;
             }             
 
             /*medium*/
             @media only screen and (min-width:601px){
-                .mj-col-button {
-                    width:55px;
-                    max-width:55px;
-                    overflow:hidden;
-                }
                 .mj-col-tag {
                     width:120px;
                     max-width:120px;
@@ -78,11 +76,6 @@
             }
             /*large*/
             @media only screen and (min-width:993px){
-                .mj-col-button {
-                    width:60px;
-                    max-width:60px;
-                    overflow:hidden;
-                }
                 .mj-col-tag {
                     width:140px;
                     max-width:140px;
