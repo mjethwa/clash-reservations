@@ -1,15 +1,16 @@
-            .mj-col-button {
-                /*width:50px;*/
-                max-width:50px;
-                overflow:hidden;
+            .mj-col-button {             
                 margin: 10px 0 0 0;
             }
             .mj-col-tag {
+                overflow:hidden;
+                white-space: nowrap;
+                margin:10px 0 0 10px;
+                font-size: 0.85em;
+                min-width: 80px;
+            }
+            .mj-col-limit {
                 width:100px;
                 max-width:100px;
-                min-height:40px;
-                overflow:hidden;
-                margin:10px 0 0 10px;
             }
             .mj-half-scroll{
                 max-height:50vh;
@@ -68,18 +69,16 @@
 
             /*medium*/
             @media only screen and (min-width:601px){
-                .mj-col-tag {
+                .mj-col-limit {
                     width:120px;
                     max-width:120px;
-                    overflow:hidden;
                 }
             }
             /*large*/
             @media only screen and (min-width:993px){
-                .mj-col-tag {
+                .mj-col-limit {
                     width:140px;
                     max-width:140px;
-                    overflow:hidden;
                 }
             }
             
