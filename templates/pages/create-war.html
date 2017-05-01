@@ -1,0 +1,12 @@
+<h1>CREATE WAR</h1>
+<div class="mj-panel mj-margin-t" ng-controller="reserveInitCtrl">
+    <input class="w3-input" placeholder="Clan Name" ng-model="oWarInfo.sClanName"/>
+    <input class="w3-input" placeholder="Enemy Clan Name" ng-model="oWarInfo.sOppositionClanName" />
+    <select class="w3-select" ng-options="item as item.sName for item in loWarSizes" ng-model="oWarInfo.oWarSize">
+        <option value="" disabled>Choose the war size ...</option>
+    </select>
+    <select class="w3-select" ng-options="item as item.sName for item in loTimerTypes" ng-model="oWarInfo.oTimerType">
+        <option value="" disabled>Choose timer type ...</option>
+    </select>                       
+    <button class="w3-btn w3-blue-grey mj-margin-t" ng-click="onCreateRequested(oWarInfo)">Create</button>
+</div>
