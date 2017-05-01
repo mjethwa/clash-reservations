@@ -31,7 +31,7 @@
                     scope: {
                         iStars: '=stars'
                     },
-                    templateUrl: 'templates/rating-stars.html'
+                    templateUrl: 'templates/controls/rating-stars.html'
                 };
             });
 
@@ -41,7 +41,7 @@
                         iRemainingTime: '=remainingTime',
                         iRemainingPerc: '=remainingPerc'
                     },
-                    templateUrl: 'templates/timer-progress.html'
+                    templateUrl: 'templates/controls/timer-progress.html'
                 };
             }]);
 

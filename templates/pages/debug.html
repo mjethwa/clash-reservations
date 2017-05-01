@@ -1,0 +1,14 @@
+<div class="mj-panel" ng-controller="firebaseConfigCtrl">
+    <button class="w3-btn w3-blue-grey" ng-click="showConfig()">FB Config</button>
+    <div class="w3-modal" style="display:block;" ng-if="bShow">
+        <div class="w3-modal-content mj-panel mj-padding-l">
+            <button class="w3-btn w3-blue-grey" ng-click="hideConfig()"><i class="fa fa-times"></i></button>
+            <input class="w3-input mj-margin-t" placeholder="API key" ng-model="oFbConfig.apiKey"/>
+            <input class="w3-input" placeholder="Auth Domain" ng-model="oFbConfig.authDomain"/>
+            <input class="w3-input" placeholder="Database Url" ng-model="oFbConfig.databaseURL"/>
+            <input class="w3-input" placeholder="Storage Bucket" ng-model="oFbConfig.storageBucket"/>
+            <input class="w3-input" placeholder="Messaging Sender Id" ng-model="oFbConfig.messagingSenderId"/>
+            <button class="w3-btn w3-blue-grey mj-margin-t" ng-click="setFbConfig(oFbConfig)">Save</button>
+        </div>
+    </div>
+</div>
